@@ -6,7 +6,7 @@ import './index.css'
 const Footer = () => {
   return (
     <Box mt={8} display="flex" justifyContent="center">
-      <Typography variant="body2" color="textSecondary" align="center">    
+      <Typography variant="body2" color="#4350AF" align="center">    
         <Link href="https://github.com/Keerat666" target="_blank" rel="noopener noreferrer">
         © 2024 Keerat
         </Link>
