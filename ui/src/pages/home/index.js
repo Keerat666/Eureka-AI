@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles'; // Import for styling
 import getTopics from '../../services/topics';
 import SearchResults from '../../components/searchResults';
 import CircularProgress from '@material-ui/core/CircularProgress'; // Import for loader
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
   container: {
@@ -40,6 +41,7 @@ const Home = () => {
   const classes = useStyles(); // Get styles from makeStyles
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false); // State for loader visibility
+  const navigate = useNavigate();
 
   const handleSearch = async (term) => {
     setIsLoading(true); // Show loader before fetching data
@@ -50,7 +52,7 @@ const Home = () => {
   };
 
   const cardListener = (id) => {
-    alert(id);
+    navigate(`/chapters`, { state: { topic: searchResults[id].topic , description: searchResults[id].description } }); 
   };
 
   return (

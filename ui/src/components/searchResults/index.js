@@ -28,7 +28,7 @@ const SearchResults = ({ searchResults, cardListener }) => {
             </ListItem>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
     <Button variant="contained" color="primary" onClick={() => cardListener(index)}>
-      Start Learning
+      Generate Chapters
     </Button>
   </div>
             </CardContent>
