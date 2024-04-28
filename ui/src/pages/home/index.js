@@ -43,6 +43,11 @@ const Home = () => {
     setSearchResults(res.results);
   };
 
+  const cardListener =(id)=>{
+
+    alert(id)
+  }
+
   return (
     <div className={classes.container}> {/* Apply container styles */}
       <Typography variant="h3" className={classes.heading}>
@@ -56,7 +61,7 @@ const Home = () => {
       </Typography>
 
       {searchResults.length > 0 && (
-        <SearchResults searchResults={searchResults}></SearchResults>
+        <SearchResults searchResults={searchResults} cardListener={cardListener}></SearchResults>
       )}
     </div>
   );

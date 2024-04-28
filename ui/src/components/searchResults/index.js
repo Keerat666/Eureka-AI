@@ -22,12 +22,12 @@ const SearchResults = ({ searchResults, cardListener }) => {
 
             <ListItem key={item.topic}>
               <ListItemText
-                primary={<Typography variant="h5">{item.topic}</Typography>}
-                secondary={<Typography variant="h6">{item.description}</Typography>}
+                primary={<Typography variant="body1">{item.topic}</Typography>}
+                secondary={<Typography variant="body2">{item.description}</Typography>}
               />
             </ListItem>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-    <Button variant="contained" color="primary" onClick={() => cardListener(item)}>
+    <Button variant="contained" color="primary" onClick={() => cardListener(index)}>
       Start Teaching
     </Button>
   </div>
