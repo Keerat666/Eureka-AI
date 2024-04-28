@@ -8,7 +8,7 @@
         "start": "node ./bin/www"
     },
     "keywords": [
-        "AutoPilot"
+        "Vox Machina"
     ],
     "author": "Vox Machina",
     "license": "ISC",
