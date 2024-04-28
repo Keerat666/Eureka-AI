@@ -26,7 +26,7 @@ const useStyles = makeStyles({
     },
   },
   searchButton: {
-    marginTop: 10, // Add some margin for spacing
+    marginTop: 25, // Add some margin for spacing
   },
   trySearchingText: { // Class for styling "Try searching..."
     marginTop: 20, // Add some margin for spacing
