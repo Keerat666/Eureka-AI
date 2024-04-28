@@ -1,0 +1,17 @@
+html, body {
+    height: 100%; /* Ensures body fills entire viewport */
+    margin: 0; /* Remove default margins */
+  }
+  
+  .main-content { /* Replace with your main content container class */
+    flex: 1; /* Allow content to fill remaining space */
+    display: flex; /* In case you have flexbox styles applied */
+    flex-direction: column; /* In case you have flexbox styles applied */
+  }
+  
+  footer {
+    position: fixed; /* Fix footer to the bottom */
+    bottom: 0; /* Position footer at the bottom */
+    width: 100%; /* Span the entire width */
+  }
+  
