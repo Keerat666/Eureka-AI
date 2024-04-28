@@ -44,7 +44,6 @@ router.post('/topics', async (req, res) => {
     ];
   
     const parts = [
-        { text: "input: Cricket" },
         { text: 'output: {"results": [{"topic": "Cricket", "description": "The sports"}, {"topic": "Cricket", "description": "The Insect"}]}' },
         { text: 'output: {"results": [{"topic": "Leonardo Da Vinci", "description": "The Legendary Renaissance Person"}, {"topic": "The Da Vinci Code - Book", "description": "The thriller book by Dan Brown"}, {"topic": "The Da Vinci Code - Movie", "description": "The thriller movie starring Tom Hanks."}]}' },
         { text: 'output: {"results": [{"topic": "Cookie", "description": "The baked food item"}, {"topic": "Captain James Cook", "description": "The British explorer"}, {"topic": "Tim Cook", "description": "The Apple CEO."}]}' },
@@ -65,17 +64,7 @@ router.post('/topics', async (req, res) => {
     });
 
     const responseString = result.response.candidates[0].content.parts[0].text;
-
-    const responseWithoutOutputPrefix = responseString.startsWith('output: ') ? responseString.slice(7) : responseString;
-
-try {
-  const responseObject = JSON.parse(responseWithoutOutputPrefix);
-  res.status(200).json(responseObject); // Return parsed JSON object
-} catch (error) {
-  console.error('Error parsing response:', error);
-  // Handle parsing error (e.g., return an error message)
-  res.status(500).json({ message: 'Internal server error' });
-}
+    res.status(200).json(responseString); // Return parsed JSON object
 
   } catch (error) {
     console.error("Error fetching data from Gemini:", error);
