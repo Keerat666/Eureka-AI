@@ -52,6 +52,12 @@ router.post('/topics', async (req, res) => {
         { text: 'output: {"results": [{"topic": "Hollywood", "description": "The American film industry based in Hollywood, Los Angeles"}]}' },
         { text: 'output: {"results": [{"topic": "Tollywood", "description": "The Telugu language film industry based in Hyderabad, India."}]}' },
         { text: 'output: {"results": [{"topic": "Painting", "description": "The art or process of applying pigment to a surface"}, {"topic": "Painting", "description": "A picture produced by painting"}]}' },
+        { text: "input: djbfjdsnfkdnf" },
+        { text: 'output: {"results": []' },
+        { text: "input: kpoervfkls dvlk023i20" },
+        { text: 'output: {"results": []' },
+        { text: "input: dhinchak babu" },
+        { text: 'output: {"results": []' },
         { text: "input: " + query },
         { text: 'output: {}' },
       ];
