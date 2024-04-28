@@ -3,9 +3,8 @@ import SearchBar from '../../components/search/index'; // Assuming SearchBar is 
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles'; // Import for styling
-import InfoIcon from '@material-ui/icons/Info';
-import IconButton from '@material-ui/core/IconButton';
-import { Grid } from '@material-ui/core';
+import getTopics from '../../services/topics';
+import SearchResults from '../../components/searchResults';
 
 const useStyles = makeStyles({
   container: {
@@ -38,17 +37,10 @@ const Home = () => {
   const classes = useStyles(); // Get styles from makeStyles
   const [searchResults, setSearchResults] = useState([]);
 
-  const data = [
-    { id: 1, name: 'Item 1' },
-    { id: 2, name: 'Item 2' },
-    { id: 3, name: 'Item 3' },
-  ];
-
-  const handleSearch = (term) => {
-    const filteredData = data.filter((item) =>
-      item.name.toLowerCase().includes(term.toLowerCase())
-    );
-    setSearchResults(filteredData);
+  
+  const handleSearch = async(term) => {
+    const res = await getTopics(term)
+    setSearchResults(res.results);
   };
 
   return (
@@ -57,22 +49,14 @@ const Home = () => {
         Learn Anything.
       </Typography>
 
-      <SearchBar data={data} onSearch={handleSearch} className={classes.searchBar} wrap="break-word" />
-
-      <Button variant="contained" color="primary" onClick={handleSearch} className={classes.searchButton}>
-        Search
-      </Button>
+      <SearchBar onSearch={handleSearch} className={classes.searchBar} wrap="break-word" />
 
       <Typography variant="body2" className={classes.trySearchingText}> {/* Use body1 for body text */}
       Search for anything, like <strong>Recursion, Water Color Painting, Cricket...</strong>
       </Typography>
 
       {searchResults.length > 0 && (
-        <ul>
-          {searchResults.map((item) => ( // Use item here
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
+        <SearchResults searchResults={searchResults}></SearchResults>
       )}
     </div>
   );
