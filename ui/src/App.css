@@ -1,38 +1,16 @@
-.App {
-  text-align: center;
+html, body {
+  height: 100%; /* Ensures body fills entire viewport */
+  margin: 0; /* Remove default margins */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.main-content { /* Replace with your main content container class */
+  flex: 1; /* Allow content to fill remaining space */
+  display: flex; /* In case you have flexbox styles applied */
+  flex-direction: column; /* In case you have flexbox styles applied */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+footer {
+  position: fixed; /* Fix footer to the bottom */
+  bottom: 0; /* Position footer at the bottom */
+  width: 100%; /* Span the entire width */
 }
