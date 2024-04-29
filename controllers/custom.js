@@ -169,4 +169,86 @@ try{
 
 })
 
+router.post('/chat',async (req,res)=>{
+  const genAI = new GoogleGenerativeAI(API_KEY);
+  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+
+  const generationConfig = {
+    temperature: 1,
+    topK: 0,
+    topP: 0.95,
+    maxOutputTokens: 8192,
+  };
+
+  const safetySettings = [
+    {
+      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+  ];
+
+  const parts = [
+    {
+      text: `You are to teach about ${req.body.title}. The name of the chapter is ${req.body.chapterName}.
+
+      The description is ${req.body.description}
+      
+      Just be limited to the above given information and if the user asks for more information tell them to go the next chapter.
+      
+      Now act like ${req.body.character} and teach me in ${req.body.language} this chapter. Feel free to use any basic phrases or dialouges that ${req.body.character} uses in their work. Also feel free to copy their style to give a feel that ${req.body.character} itself is texting.
+      
+      Just return me a json in the form of {"reply" : "insert your actual reply here in ${req.body.language} "}
+
+      Please only send the json and nothing else.
+
+      `
+      
+    }
+      ];
+
+  const result = await model.generateContent({
+    contents: [{ role: "user", parts }],
+    generationConfig,
+    safetySettings,
+  });
+
+  console.log(result)
+
+  const response = result// Your response object from the API call
+
+// Get the first element from the "candidates" array
+const candidate = response.response.candidates[0];
+
+// Extract the content (chapter information)
+const content = candidate.content.parts[0].text;
+// Remove leading and trailing code block markers
+const cleanContent = content.replace(/^```json\n/, '').replace(/\n`$/, '').replace('```', '').replace("\\", "");;
+console.log(cleanContent)
+try{
+  const chapters = JSON.parse(cleanContent);
+  res.status(200).json(chapters)
+
+}catch(error)
+{
+  // res.status(500).json({"error" : error})
+  res.status(500).json(response)
+
+
+}
+
+
+})
+
 module.exports = router;

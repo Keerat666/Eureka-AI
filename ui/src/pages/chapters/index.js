@@ -4,6 +4,7 @@ import getChapters from '../../services/chapters'; // Assuming a service to fetc
 import CircularProgress from '@material-ui/core/CircularProgress'; // Import for loader
 import { useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, Button, Grid } from '@material-ui/core'; // Import Grid
+import { useNavigate } from 'react-router-dom';
 
 const Chapters = () => {
   const [chapters, setChapters] = useState([]);
@@ -11,6 +12,7 @@ const Chapters = () => {
   const location = useLocation();
   const topic = location.state?.topic; // Access data using optional chaining
   const description = location.state?.description;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchChapters = async () => {
@@ -30,6 +32,12 @@ const Chapters = () => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
   };
 
+  const characterNavigate =(index)=>{
+    navigate(`/characters`, { state: { chapters: chapters , index: index} }); 
+  }
+
+  
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}> {/* Vertical centering */}
       {isLoading && (
@@ -44,7 +52,7 @@ const Chapters = () => {
             <Typography variant="h4" style={{marginTop : 20}}>{topic}</Typography>
           </div>
           <Grid container spacing={2}> {/* Grid container with spacing between cards */}
-            {chapters.map((chapter) => (
+            {chapters.map((chapter,index) => (
               <Grid item xs={12} key={chapter.id}> {/* One card per row */}
                 <Card style={{ display: 'flex', flexDirection: 'column' }}> {/* Card with flexbox layout */}
                   <CardHeader
@@ -58,7 +66,7 @@ const Chapters = () => {
                     <Typography variant="body1">
                       {truncateContent(chapter.content)} {/* Truncate and add ellipsis */}
                     </Typography>
-                    <Button variant="contained" color="primary" style={{ marginTop: 10 }}>
+                    <Button variant="contained" color="primary" onClick={() => characterNavigate(index)} style={{ marginTop: 10 }}>
                       Start Learning
                     </Button>
                   </CardContent>
