@@ -6,6 +6,8 @@ import getTopics from '../../services/topics';
 import SearchResults from '../../components/searchResults';
 import CircularProgress from '@material-ui/core/CircularProgress'; // Import for loader
 import { useNavigate } from 'react-router-dom';
+import Speak from '../../components/speak';
+import Listen from '../../components/listen';
 
 const useStyles = makeStyles({
   container: {
@@ -57,10 +59,6 @@ const Home = () => {
 
   return (
     <div className={classes.container}> {/* Apply container styles */}
-      <Typography variant="h3" className={classes.heading}>
-        Learn Anything.
-      </Typography>
-
       <SearchBar onSearch={handleSearch} className={classes.searchBar} wrap="break-word" />
 
       <Typography variant="body2" className={classes.trySearchingText}> {/* Use body1 for body text */}
