@@ -53,6 +53,8 @@ const CharacterList = ({ }) => {
   const location = useLocation();
   const chapters = location.state?.chapters; // Access data using optional chaining
   const index = location.state?.index;
+  const topic = location.state?.topic;
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -74,7 +76,7 @@ const CharacterList = ({ }) => {
     const chosenChapterTitle = chapters[index].title
 
     alert(character.name + " will teach the chapter "+chosenChapterTitle)
-    navigate(`/learn`, { state: { chapters: chapters , index: index , character : character} }); 
+    navigate(`/learn`, { state: { chapters: chapters , index: index , character : character, topic : topic} }); 
 
   }
 
