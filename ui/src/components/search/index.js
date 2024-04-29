@@ -3,6 +3,7 @@ import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 import { makeStyles } from '@material-ui/core/styles'; // Import for styling
+import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles({
   searchBar: {
@@ -18,11 +19,13 @@ const useStyles = makeStyles({
   },
 });
 
-const SearchBar = ({ data, onSearch }) => {
+const SearchBar = ({ onSearch }) => {
   const classes = useStyles(); // Get styles from makeStyles
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleChange = (event) => {
+
+    console.log(event.target.value)
     setSearchTerm(event.target.value);
   };
 
@@ -45,8 +48,6 @@ const SearchBar = ({ data, onSearch }) => {
 <IconButton onClick={handleSearch} style={{ backgroundColor: '#cccccc' }}>
   <SearchIcon style={{ color: '#3f51b5' }} className={classes.searchIcon} /> {/* Set icon color here */}
 </IconButton>
-
-
     </div>
   );
 };

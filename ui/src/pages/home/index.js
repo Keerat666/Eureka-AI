@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SearchBar from '../../components/search/index'; // Assuming SearchBar is in a separate file
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles'; // Import for styling
-import InfoIcon from '@material-ui/icons/Info';
-import IconButton from '@material-ui/core/IconButton';
-import { Grid } from '@material-ui/core';
+import getTopics from '../../services/topics';
+import SearchResults from '../../components/searchResults';
+import CircularProgress from '@material-ui/core/CircularProgress'; // Import for loader
+import { useNavigate } from 'react-router-dom';
+import Speak from '../../components/speak';
+import Listen from '../../components/listen';
 
 const useStyles = makeStyles({
   container: {
@@ -13,7 +15,7 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '80vh', // Ensures footer stays at bottom (optional)
+    height: '100vh', // Ensures footer stays at bottom (optional)
   },
   heading: {
     marginBottom: 20,
@@ -32,47 +34,43 @@ const useStyles = makeStyles({
     marginTop: 20, // Add some margin for spacing
     textAlign: 'center', // Center align the text
   },
+  loader: {
+    marginTop: 25, // Center the loader
+  },
 });
 
 const Home = () => {
   const classes = useStyles(); // Get styles from makeStyles
   const [searchResults, setSearchResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // State for loader visibility
+  const navigate = useNavigate();
 
-  const data = [
-    { id: 1, name: 'Item 1' },
-    { id: 2, name: 'Item 2' },
-    { id: 3, name: 'Item 3' },
-  ];
+  const handleSearch = async (term) => {
+    setIsLoading(true); // Show loader before fetching data
+    setSearchResults([])
+    const res = await getTopics(term);
+    setSearchResults(res.results);
+    setIsLoading(false); // Hide loader after fetching data
+  };
 
-  const handleSearch = (term) => {
-    const filteredData = data.filter((item) =>
-      item.name.toLowerCase().includes(term.toLowerCase())
-    );
-    setSearchResults(filteredData);
+  const cardListener = (id) => {
+    navigate(`/chapters`, { state: { topic: searchResults[id].topic , description: searchResults[id].description } }); 
   };
 
   return (
     <div className={classes.container}> {/* Apply container styles */}
-      <Typography variant="h3" className={classes.heading}>
-        Learn Anything.
-      </Typography>
-
-      <SearchBar data={data} onSearch={handleSearch} className={classes.searchBar} wrap="break-word" />
-
-      <Button variant="contained" color="primary" onClick={handleSearch} className={classes.searchButton}>
-        Search
-      </Button>
+      <SearchBar onSearch={handleSearch} className={classes.searchBar} wrap="break-word" />
 
       <Typography variant="body2" className={classes.trySearchingText}> {/* Use body1 for body text */}
-      Search for anything, like <strong>Recursion, Water Color Painting, Cricket...</strong>
+        Search for anything, like <strong>Recursion, Water Color Painting, Cricket...</strong>
       </Typography>
 
+      {isLoading && (
+        <CircularProgress size={40} className={classes.loader} /> // Show loader when isLoading is true
+      )}
+
       {searchResults.length > 0 && (
-        <ul>
-          {searchResults.map((item) => ( // Use item here
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
+        <SearchResults searchResults={searchResults} cardListener={cardListener}></SearchResults>
       )}
     </div>
   );

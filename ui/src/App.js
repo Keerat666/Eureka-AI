@@ -1,16 +1,27 @@
-import Home from './pages/home/index'; // Assuming MyComponent is in a separate file
-import Footer from './components/footer'
-import HeaderPanel from './components/header'
+import Home from "./pages/home/index"; 
+import Chapters from "./pages/chapters/index"; // Assuming MyComponent is in a separate file
 
+import Footer from "./components/footer";
+import Header from "./components/header";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import CharacterList from "./components/characters";
+import ChatComponent from "./pages/chat";
 
 function App() {
   return (
-    <div>
-      <HeaderPanel></HeaderPanel>
-      <Home>
-      </Home>
-      <Footer></Footer>
-    </div>
+    <Router>
+      <div>
+        <Header></Header>
+        <Routes>
+          <Route path="/" element={<Home />} /> {/* Home route at root path */}
+          <Route path="/chapters" element={<Chapters />} />{" "}
+          <Route path="/characters" element={<CharacterList />} />{" "}
+          <Route path="/learn" element={<ChatComponent />} />{" "}
+
+          {/* Chapters route with dynamic parameter */}
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
