@@ -33,7 +33,7 @@ const Chapters = () => {
   };
 
   const characterNavigate =(index)=>{
-    navigate(`/characters`, { state: { chapters: chapters , index: index} }); 
+    navigate(`/characters`, { state: { chapters: chapters , index: index, topic : topic} }); 
   }
 
   

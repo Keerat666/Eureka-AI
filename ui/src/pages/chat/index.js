@@ -9,6 +9,7 @@ import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
 import { useLocation } from 'react-router-dom';
 import { characters } from 'shortid';
+import chatAPI from '../../services/chat';
 
 const useStyles = makeStyles({
   container: {
@@ -86,6 +87,7 @@ const ChatComponent = () => {
   const location = useLocation();
   const chapters = location.state?.chapters; // Access data using optional chaining
   let ind = location.state?.index;
+  const topic = location.state?.topic; // Access data using optional chaining
 
   const [index, setIndex] = useState(ind);
 
@@ -101,41 +103,45 @@ const ChatComponent = () => {
 
   useEffect(()=>{
 
-    alert("Hello")
     //simulate an API call here to Gemini
-    
+    const reply = geminiReply()
+    console.log(reply.reply)
     const message = {
         id: Date.now(), // Example: Generate unique ID for each message
         sender: character.name,
-        text: `This is SRK here. Welcome to your lesson for ${chapters[index].title}`,
+        text: reply.reply,
       };
   
-    setMessages([...messages, message]);   
+    setMessages([...messages, message]);  
 
 
   },[])
 
-  const handleResponse=()=>{
+  const handleResponse=async ()=>{
 
+    const reply = await geminiReply()
+    console.log(reply.reply)
     const message = {
         id: Date.now(), // Example: Generate unique ID for each message
         sender: character.name,
-        text: `Yes I hear you.`,
+        text: reply.reply,
       };
   
     setMessages([...messages, message]);   
   }
 
-  const switchToNewChapter =(id)=>{
+  const switchToNewChapter =async (id)=>{
 
-    const message = {
-        id: Date.now(), // Example: Generate unique ID for each message
-        sender: character.name,
-        text: `This is SRK here. Welcome to your lesson for ${chapters[id].title}`,
-      };
-  
-    setMessages([...messages, message]);   
-
+    setIndex(id)
+      const reply = await geminiReply()
+      console.log(reply.reply)
+      const message = {
+          id: Date.now(), // Example: Generate unique ID for each message
+          sender: character.name,
+          text: reply.reply,
+        };
+    
+      setMessages([...messages, message]);  
   }
 
   const handleSendMessage = () => {
@@ -154,6 +160,12 @@ const ChatComponent = () => {
 
   const handleFinish =()=>{
     alert("Navigate to Homepage")
+  }
+
+  const geminiReply=async()=>{
+
+    const response = await chatAPI(topic,chapters[index].title,chapters[index].description,character.name,"english")
+    return response;
   }
 
   return (

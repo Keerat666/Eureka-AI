@@ -7,7 +7,7 @@ const {
   } = require("@google/generative-ai");
 
 // Replace 'YOUR_GEMINI_API_KEY' with your actual Gemini API key
-const API_KEY = 'AIzaSyAFOt7wdjgK-ejsbP8s33caF78-yAJRQSw';
+const API_KEY = process.env.GeminiKey;
 const MODEL_NAME = "gemini-1.5-pro-latest";
 
 router.post('/topics', async (req, res) => {
@@ -58,6 +58,7 @@ router.post('/topics', async (req, res) => {
         { text: 'output: {"results": []' },
         { text: "input: dhinchak babu" },
         { text: 'output: {"results": []' },
+        { text: 'Output in JSON format only. Do not use markdown.' },
         { text: "input: " + query },
         { text: 'output: {}' },
       ];
@@ -134,6 +135,8 @@ router.post('/chapters',async (req,res)=>{
           // ... and so on for remaining chapters
         ]
       }
+
+      Output in JSON format only. Do not use markdown.
       `
     }
       ];
@@ -212,6 +215,7 @@ router.post('/chat',async (req,res)=>{
       Just return me a json in the form of {"reply" : "insert your actual reply here in ${req.body.language} "}
 
       Please only send the json and nothing else.
+      Output in JSON format only. Do not use markdown.
 
       `
       
