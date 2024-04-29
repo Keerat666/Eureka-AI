@@ -103,19 +103,26 @@ const ChatComponent = () => {
 
   useEffect(()=>{
 
-    //simulate an API call here to Gemini
-    const reply = geminiReply()
-    console.log(reply.reply)
-    const message = {
-        id: Date.now(), // Example: Generate unique ID for each message
+    const fetchData = async () => {
+      const response = await init();
+      const message = {
+        id: Date.now(),
         sender: character.name,
-        text: reply.reply,
+        text: response.reply, // Assuming response has a "reply" property
       };
+      setMessages([...messages, message]);
+    };
   
-    setMessages([...messages, message]);  
+    fetchData();
 
 
-  },[])
+  },[index])
+
+  const init =async ()=>{
+
+   return await geminiReply()
+
+  }
 
   const handleResponse=async ()=>{
 
@@ -133,15 +140,6 @@ const ChatComponent = () => {
   const switchToNewChapter =async (id)=>{
 
     setIndex(id)
-      const reply = await geminiReply()
-      console.log(reply.reply)
-      const message = {
-          id: Date.now(), // Example: Generate unique ID for each message
-          sender: character.name,
-          text: reply.reply,
-        };
-    
-      setMessages([...messages, message]);  
   }
 
   const handleSendMessage = () => {
@@ -153,9 +151,9 @@ const ChatComponent = () => {
       text: newMessage,
     };
 
+    handleResponse()
     setMessages([...messages, message]);    
     setNewMessage(''); // Clear input after sending
-    handleResponse()
   };
 
   const handleFinish =()=>{
@@ -163,8 +161,7 @@ const ChatComponent = () => {
   }
 
   const geminiReply=async()=>{
-
-    const response = await chatAPI(topic,chapters[index].title,chapters[index].description,character.name,"english")
+    const response = await chatAPI(topic,chapters[index].title,chapters[index].content,character.name,"english",newMessage)
     return response;
   }
 

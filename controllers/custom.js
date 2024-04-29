@@ -9,6 +9,7 @@ const {
 // Replace 'YOUR_GEMINI_API_KEY' with your actual Gemini API key
 const API_KEY = process.env.GeminiKey;
 const MODEL_NAME = "gemini-1.5-pro-latest";
+const extract = require('extract-json-from-string');
 
 router.post('/topics', async (req, res) => {
   const query = req.body.query;
@@ -147,6 +148,9 @@ router.post('/chapters',async (req,res)=>{
     safetySettings,
   });
 
+  
+try{
+
   console.log(result)
 
   const response = result// Your response object from the API call
@@ -159,7 +163,6 @@ const content = candidate.content.parts[0].text;
 // Remove leading and trailing code block markers
 const cleanContent = content.replace(/^```json\n/, '').replace(/\n`$/, '').replace('```', '');
 
-try{
   const chapters = JSON.parse(cleanContent);
   res.status(200).json(chapters)
 
@@ -186,19 +189,19 @@ router.post('/chat',async (req,res)=>{
   const safetySettings = [
     {
       category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
     },
     {
       category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
     },
     {
       category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
     },
     {
       category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
     },
   ];
 
@@ -207,20 +210,24 @@ router.post('/chat',async (req,res)=>{
       text: `You are to teach about ${req.body.title}. The name of the chapter is ${req.body.chapterName}.
 
       The description is ${req.body.description}
+            
+      Now act like ${req.body.character} and be a teacher in ${req.body.language} for this chapter. Feel free to use any basic phrases or dialouges that ${req.body.character} uses in their work. Also feel free to copy their style to give a feel that ${req.body.character} itself is texting.
       
-      Just be limited to the above given information and if the user asks for more information tell them to go the next chapter.
-      
-      Now act like ${req.body.character} and teach me in ${req.body.language} this chapter. Feel free to use any basic phrases or dialouges that ${req.body.character} uses in their work. Also feel free to copy their style to give a feel that ${req.body.character} itself is texting.
-      
+      New message from the user is ${req.body.newMessage}. If there is no new message then talk about the chapter otherwise reply to the user's message.
+
+      You are a conversational teacher so answer the above message. But if the question is not related to ${req.body.title}, express your ignorance to answer the question.
+
       Just return me a json in the form of {"reply" : "insert your actual reply here in ${req.body.language} "}
 
-      Please only send the json and nothing else.
+      Please only send the json and nothing else.Do not add anything in the reply value which gives me an error while doing a JSON.parse(). Keep the structure in such a way that on doing a JSON.parse() I can directly get the JSON.
       Output in JSON format only. Do not use markdown.
 
       `
       
     }
       ];
+
+      console.log(parts)
 
   const result = await model.generateContent({
     contents: [{ role: "user", parts }],
@@ -230,24 +237,26 @@ router.post('/chat',async (req,res)=>{
 
   console.log(result)
 
+try{
+
   const response = result// Your response object from the API call
 
-// Get the first element from the "candidates" array
-const candidate = response.response.candidates[0];
-
-// Extract the content (chapter information)
-const content = candidate.content.parts[0].text;
-// Remove leading and trailing code block markers
-const cleanContent = content.replace(/^```json\n/, '').replace(/\n`$/, '').replace('```', '').replace("\\", "");;
-console.log(cleanContent)
-try{
-  const chapters = JSON.parse(cleanContent);
-  res.status(200).json(chapters)
+  // Get the first element from the "candidates" array
+  const candidate = response.response.candidates[0];
+  console.log(candidate)
+  // Extract the content (chapter information)
+  const content = candidate.content?.parts[0].text;
+  // Remove leading and trailing code block markers
+  const cleanContent = content.replace(/^```json\n/, '').replace(/\n`$/, '').replace('```', '').replace("\\", "");;
+  console.log(cleanContent)
+  let objects = extract(cleanContent);
+  res.status(200).json(objects)
 
 }catch(error)
 {
-  // res.status(500).json({"error" : error})
-  res.status(500).json(response)
+  console.log(error)
+   res.status(500).json({"error" : error, "result" : result})
+  //res.status(500).json(response)
 
 
 }
