@@ -207,9 +207,9 @@ router.post('/chat',async (req,res)=>{
       
       Just be limited to the above given information and if the user asks for more information tell them to go the next chapter.
       
-      Now act like ${req.body.character} and teach me this chapter.
+      Now act like ${req.body.character} and teach me in ${req.body.language} this chapter. Feel free to use any basic phrases or dialouges that ${req.body.character} uses in their work. Also feel free to copy their style to give a feel that ${req.body.character} itself is texting.
       
-      Just return me a json in the form of {"reply" : "insert your actual reply here"}
+      Just return me a json in the form of {"reply" : "insert your actual reply here in ${req.body.language} "}
 
       Please only send the json and nothing else.
 
@@ -234,15 +234,17 @@ const candidate = response.response.candidates[0];
 // Extract the content (chapter information)
 const content = candidate.content.parts[0].text;
 // Remove leading and trailing code block markers
-const cleanContent = content.replace(/^```json\n/, '').replace(/\n`$/, '').replace('```', '');
-
+const cleanContent = content.replace(/^```json\n/, '').replace(/\n`$/, '').replace('```', '').replace("\\", "");;
+console.log(cleanContent)
 try{
   const chapters = JSON.parse(cleanContent);
   res.status(200).json(chapters)
 
 }catch(error)
 {
-  res.status(500).json({"error" : error})
+  // res.status(500).json({"error" : error})
+  res.status(500).json(response)
+
 
 }
 
