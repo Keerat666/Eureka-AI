@@ -1,12 +1,12 @@
 import axios from "axios"; // Assuming axios is installed
 
-const baseUrl = "https://voxmachina.onrender.com";
+const baseUrl = "http://localhost:8009";
 
 
-  const chatAPI = async (title,chapterName,description,character,language) => {
+  const chatAPI = async (title,chapterName,description,character,language,newMessage) => {
 
     try {
-      const data = JSON.stringify({ title,chapterName,description,character,language }); // Stringify the object
+      const data = JSON.stringify({ title,chapterName,description,character,language,newMessage }); // Stringify the object
       const config = {
         method: "post",
         url: `${baseUrl}/controller/chat`,
@@ -17,7 +17,7 @@ const baseUrl = "https://voxmachina.onrender.com";
       };
 
       const response = await axios(config);
-      return response.data; // Access data from response
+      return response.data[0]; // Access data from response
     } catch (error) {
       console.error("Error fetching topics:", error);
       throw new Error("Failed to get topics"); // Re-throw a more informative error
