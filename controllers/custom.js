@@ -87,4 +87,86 @@ router.post('/topics', async (req, res) => {
   }
 });
 
+router.post('/chapters',async (req,res)=>{
+  const genAI = new GoogleGenerativeAI(API_KEY);
+  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+
+  const generationConfig = {
+    temperature: 1,
+    topK: 0,
+    topP: 0.95,
+    maxOutputTokens: 8192,
+  };
+
+  const safetySettings = [
+    {
+      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+  ];
+
+  const parts = [
+    {
+      text: `Act as an experienced teacher who knows all about ${req.body.topic}. To give more context, ${req.body.description}. Now generate an array of objects with 5 chapters in which you can explain an overall summary about it. 
+    
+      Return a JSON object containing an array of objects, each representing a chapter. Each chapter object should have a "title" (string) and "content" (string) property. 
+    
+      The response should be a valid JSON string that can be parsed using JSON.parse in your Node.js backend.
+    
+      Here's an example format:
+    
+      {
+        "results": [
+          { "title": "Chapter 1 Title", "content": "Chapter 1 Content" },
+          { "title": "Chapter 2 Title", "content": "Chapter 2 Content" },
+          // ... and so on for remaining chapters
+        ]
+      }
+      `
+    }
+      ];
+
+  const result = await model.generateContent({
+    contents: [{ role: "user", parts }],
+    generationConfig,
+    safetySettings,
+  });
+
+  console.log(result)
+
+  const response = result// Your response object from the API call
+
+// Get the first element from the "candidates" array
+const candidate = response.response.candidates[0];
+
+// Extract the content (chapter information)
+const content = candidate.content.parts[0].text;
+// Remove leading and trailing code block markers
+const cleanContent = content.replace(/^```json\n/, '').replace(/\n`$/, '').replace('```', '');
+
+try{
+  const chapters = JSON.parse(cleanContent);
+  res.status(200).json(chapters)
+
+}catch(error)
+{
+  res.status(500).json({"error" : error})
+
+}
+
+
+})
+
 module.exports = router;
