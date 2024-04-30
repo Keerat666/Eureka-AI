@@ -59,7 +59,6 @@ router.post('/topics', async (req, res) => {
         { text: 'output: {"results": []' },
         { text: "input: dhinchak babu" },
         { text: 'output: {"results": []' },
-        { text: `Output in JSON format only.Do not use markdown.Do not use " symbol in the reply, if you have to use " use ' instead.You can use emojis.` },
         { text: "input: " + query },
         { text: 'output: {}' },
       ];
