@@ -10,6 +10,9 @@ import TextField from '@material-ui/core/TextField';
 import { useLocation } from 'react-router-dom';
 import { characters } from 'shortid';
 import chatAPI from '../../services/chat';
+import { useNavigate } from 'react-router-dom';
+import Avatar from '@material-ui/core/Avatar';
+import { Grid } from '@material-ui/core';
 
 const useStyles = makeStyles({
   container: {
@@ -35,32 +38,38 @@ const useStyles = makeStyles({
   },
   messageInput: {
     marginTop: 0,
-  },
+  }
 });
 
-const ChatBox = ({ messages }) => {
-  const classes = useStyles();
-  const location = useLocation();
-  const chapters = location.state?.chapters; // Access data using optional chaining
-  const index = location.state?.index;
-  const character = location.state?.character;
-
-  console.log(chapters)
-  console.log(index)
-  console.log(character)
-
+const ChatBox = ({ messages, typing , characterName, topic }) => {
   return (
-    <div className={classes.chatHistory}>
+    <div className="chat-history">
+
+<Typography variant="h4">
+Chat with {characterName} about {topic}
+  </Typography>
+      
+  <div className="chat-container">
       {messages.map((message) => (
-        <div key={message.id}>
-          <Typography variant="body2" color={message.sender === 'User' ? 'primary' : 'textSecondary'}>
-            {message.sender}: {message.text}
-          </Typography>
-        </div>
+       <Grid container key={message.id} spacing={2} style={{ marginTop: 10 }}>
+       <Grid item xs={1}>
+         <Avatar alt={message.sender} src={message.image} style={{ width: 60, height: 60 }} />
+       </Grid>
+       <Grid item xs={11} style={{ padding: 5 }}>
+         <div style={{ display: 'flex', alignItems: 'center' }}>
+           <Typography variant="body2" style={{ fontSize: 18 }}>
+             {message.text}
+           </Typography>
+         </div>
+       </Grid>
+     </Grid>
       ))}
+    </div>
+       {typing === true ? <Typography variant="body1" style={{textAlign : "center", marginTop : 5}}>{characterName} is typing ... </Typography> : <></>}
     </div>
   );
 };
+
 
 const ChapterList = ({ chapters, onChapterTrigger, index }) => {
     const classes = useStyles();
@@ -71,7 +80,7 @@ const ChapterList = ({ chapters, onChapterTrigger, index }) => {
             button
             key={chapter.title}
             onClick={() => onChapterTrigger(i)}
-            style={{ backgroundColor: index === i ? 'green' : '' }}
+            style={{ backgroundColor: index === i ? '#6374F1' : '' }}
           >
             <ListItemText primary={chapter.title} />
           </ListItem>
@@ -94,12 +103,26 @@ const ChatComponent = () => {
   const character = location.state?.character;
   const [newMessage, setNewMessage] = useState("");
 
+  const [userMessage, setUserMessage] = useState(false);
+
+  const [disableNewMessage, setDisableNewMessage] = useState(true);
+  const navigate = useNavigate();
+
+  
   const handleChapterTrigger = (chapterId) => {
     // Handle chapter trigger logic here (e.g., update messages or state)
-    alert(`Chapter triggered: ${chapterId}`);
     setIndex(chapterId)
     switchToNewChapter(chapterId)
   };
+
+  useEffect(()=>{
+    if(userMessage)
+    {
+      handleResponse()
+      setUserMessage(false)
+      setNewMessage('')
+    }
+  },[userMessage])
 
   useEffect(()=>{
 
@@ -108,9 +131,12 @@ const ChatComponent = () => {
       const message = {
         id: Date.now(),
         sender: character.name,
-        text: response.reply, // Assuming response has a "reply" property
+        text: response.reply,
+        image : character.imageUrl
       };
-      setMessages([...messages, message]);
+      setMessages(messages.concat(message))
+      
+      //setMessages([...messages, message]);
     };
   
     fetchData();
@@ -120,48 +146,82 @@ const ChatComponent = () => {
 
   const init =async ()=>{
 
-   return await geminiReply()
+   return await geminiReply("Initial")
 
   }
 
   const handleResponse=async ()=>{
 
-    const reply = await geminiReply()
+    const reply = await geminiReply("Chat")
     console.log(reply.reply)
-    const message = {
+    const message1 = {
         id: Date.now(), // Example: Generate unique ID for each message
         sender: character.name,
         text: reply.reply,
+        image : character.imageUrl
       };
   
-    setMessages([...messages, message]);   
+    //setMessages([...messages, message]); 
+    console.log(messages)
+    console.log(message1)
+
+    setMessages(messages.concat(message1)) 
   }
 
   const switchToNewChapter =async (id)=>{
 
     setIndex(id)
+    const message = {
+      id: Date.now(), // Example: Generate unique ID for each message
+      sender: 'System',
+      text: `Switching to ${chapters[id].title} `,
+      image : "https://cdn-icons-png.flaticon.com/512/5087/5087579.png"
+    };
+
+    setMessages(messages.concat(message))  
   }
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim()) return; // Prevent sending empty messages
 
     const message = {
       id: Date.now(), // Example: Generate unique ID for each message
-      sender: 'User',
+      sender: 'You',
       text: newMessage,
+      image : "https://cdn-icons-png.flaticon.com/512/5087/5087579.png"
     };
 
-    handleResponse()
-    setMessages([...messages, message]);    
-    setNewMessage(''); // Clear input after sending
+    //setMessages([...messages, message]);  
+    setMessages(messages.concat(message))  
+    setUserMessage(true)
   };
 
   const handleFinish =()=>{
-    alert("Navigate to Homepage")
+    navigate(`/`); 
+
   }
 
-  const geminiReply=async()=>{
-    const response = await chatAPI(topic,chapters[index].title,chapters[index].content,character.name,"english",newMessage)
+  const handleExport =()=>{
+  }
+
+  const handleClear =()=>{
+    setMessages([])
+  }
+
+  const geminiReply=async(type)=>{
+
+    setDisableNewMessage(true)
+    let message = newMessage;  
+    if(type!=="Initial")
+    {
+      message = messages.map(message => `${message.sender}: ${message.text}`).join("\n");
+      console.log(message)
+
+    }
+
+
+    const response = await chatAPI(topic,chapters[index].title,chapters[index].content,character.name,"english",newMessage,type,message)
+    setDisableNewMessage(false)
     return response;
   }
 
@@ -169,8 +229,8 @@ const ChatComponent = () => {
     <div className={classes.container}>
       <ChapterList chapters={chapters} onChapterTrigger={handleChapterTrigger} index={index} />
       <Divider orientation="vertical" />
-      <div className={classes.chatBox}>
-        <ChatBox messages={messages} />
+      <div className={classes.chatBox} >
+        <ChatBox messages={messages} typing={disableNewMessage} characterName={character.name} topic={topic} />
         <TextField
           className={classes.messageInput}
           label="Type your message..."
@@ -179,14 +239,30 @@ const ChatComponent = () => {
           value={newMessage}
           onChange={(event) => setNewMessage(event.target.value)}
           onKeyPress={(event) => { if (event.key === 'Enter') handleSendMessage(); }}
+          disabled={disableNewMessage}
+          style={{marginTop : 5}}
         />
-        <Button variant="contained" color="primary" onClick={handleSendMessage} >
+
+
+        <Button disabled={disableNewMessage} variant="contained" color="primary" onClick={handleSendMessage} style={{backgroundColor: '#4350af', color: 'white'}} >
           Send
         </Button>
 
-        <Button variant="contained" color="danger" onClick={handleFinish} style={{marginTop : 20}}>
-          Finish
-        </Button>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+  <Button variant="contained" disabled={disableNewMessage} onClick={handleClear} style={{ marginTop: 20 , marginBottom : 20 , marginRight : 20 }}>
+    Clear Chat
+  </Button>
+  <Button variant="contained" disabled={disableNewMessage} onClick={handleExport} style={{ backgroundColor: '#5bc0be', color: 'white', margin: 20 }}>
+    Export Chat
+  </Button>
+  <Button variant="contained" color="secondary" onClick={handleFinish} style={{ margin: 20 }}>
+    Finish
+  </Button>
+
+        </div>
+ 
+
+
       </div>
     </div>
   );

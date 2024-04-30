@@ -28,19 +28,19 @@ router.post('/topics', async (req, res) => {
     const safetySettings = [
       {
         category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
       },
       {
         category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
       },
       {
         category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
       },
       {
         category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
       },
     ];
   
@@ -59,7 +59,7 @@ router.post('/topics', async (req, res) => {
         { text: 'output: {"results": []' },
         { text: "input: dhinchak babu" },
         { text: 'output: {"results": []' },
-        { text: 'Output in JSON format only. Do not use markdown.' },
+        { text: `Output in JSON format only.Do not use markdown.Do not use " symbol in the reply, if you have to use " use ' instead.You can use emojis.` },
         { text: "input: " + query },
         { text: 'output: {}' },
       ];
@@ -71,13 +71,13 @@ router.post('/topics', async (req, res) => {
       safetySettings,
     });
 
-    const responseString = result.response.candidates[0].content.parts[0].text;
-
-    const responseWithoutOutputPrefix = responseString.startsWith('output: ') ? responseString.slice(7) : responseString;
-
     try {
-      const responseObject = JSON.parse(responseWithoutOutputPrefix);
-      res.status(200).json(responseObject); // Return parsed JSON object
+
+      const responseString = result.response.candidates[0].content.parts[0].text;
+
+      const responseWithoutOutputPrefix = responseString.startsWith('output: ') ? responseString.slice(7).trim() : responseString.trim();
+      let objects = extract(responseWithoutOutputPrefix);
+      res.status(200).json(objects[0]); // Return parsed JSON object
     } catch (error) {
       console.error('Error parsing response:', error);
       // Handle parsing error (e.g., return an error message)
@@ -103,19 +103,19 @@ router.post('/chapters',async (req,res)=>{
   const safetySettings = [
     {
       category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
     },
     {
       category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
     },
     {
       category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
     },
     {
       category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
     },
   ];
 
@@ -125,7 +125,7 @@ router.post('/chapters',async (req,res)=>{
     
       Return a JSON object containing an array of objects, each representing a chapter. Each chapter object should have a "title" (string) and "content" (string) property. 
     
-      The response should be a valid JSON string that can be parsed using JSON.parse in your Node.js backend.
+      The response should be a valid JSON string that can be parsed using JSON.parse in my Node.js backend.
     
       Here's an example format:
     
@@ -137,7 +137,9 @@ router.post('/chapters',async (req,res)=>{
         ]
       }
 
-      Output in JSON format only. Do not use markdown.
+      Output in JSON format only. 
+      
+      Do not use markdown.Do not use " symbol in the response, if you have to use " use ' instead.You can use emojis.
       `
     }
       ];
@@ -163,8 +165,8 @@ const content = candidate.content.parts[0].text;
 // Remove leading and trailing code block markers
 const cleanContent = content.replace(/^```json\n/, '').replace(/\n`$/, '').replace('```', '');
 
-  const chapters = JSON.parse(cleanContent);
-  res.status(200).json(chapters)
+let objects = extract(cleanContent);
+  res.status(200).json(objects[0])
 
 }catch(error)
 {
@@ -175,7 +177,7 @@ const cleanContent = content.replace(/^```json\n/, '').replace(/\n`$/, '').repla
 
 })
 
-router.post('/chat',async (req,res)=>{
+router.post('/init-chat',async (req,res)=>{
   const genAI = new GoogleGenerativeAI(API_KEY);
   const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
@@ -205,27 +207,64 @@ router.post('/chat',async (req,res)=>{
     },
   ];
 
-  const parts = [
-    {
-      text: `You are to teach about ${req.body.title}. The name of the chapter is ${req.body.chapterName}.
+  let parts=[]
 
-      The description is ${req.body.description}
-            
-      Now act like ${req.body.character} and be a teacher in ${req.body.language} for this chapter. Feel free to use any basic phrases or dialouges that ${req.body.character} uses in their work. Also feel free to copy their style to give a feel that ${req.body.character} itself is texting.
-      
-      New message from the user is ${req.body.newMessage}. If there is no new message then talk about the chapter otherwise reply to the user's message.
 
-      You are a conversational teacher so answer the above message. But if the question is not related to ${req.body.title}, express your ignorance to answer the question.
+  if(req.body.type === "Initial")
+  {
+    parts = [
+      {
+        text: `You are an online teacher about the subject ${req.body.title}. The name of the chapter in that subject is ${req.body.chapterName}.You are teaching some one on one on text.
+  
+        The description of the chapter is ${req.body.description}
+              
+        Now act like ${req.body.character} and text in ${req.body.language} for teaching this chapter. Use any basic phrases or dialouges that ${req.body.character} uses in their lingo without fail. Mimic their style and chat to give a feel that ${req.body.character} itself is texting. Use their references of things that ${req.body.character} is known for to explain ${req.body.chapterName} of ${req.body.title}.
+        
+        Now start teaching this subject using text.
+  
+        Just return me a json in the form of {"reply" : "insert your actual reply here in ${req.body.language} "}
+  
+        Please only send the json and nothing else.Do not add anything in the reply value which gives me an error while doing a JSON.parse(). Keep the structure in such a way that on doing a JSON.parse() I can directly get the JSON.
+        Output in JSON format only. 
+        
+        Do not use markdown.Do not use " symbol in the reply, if you have to use " use ' instead.You can use emojis.
+        Do not add line breaks manually.The formatting should be such that the whole reply is one long string.
+        `
+        
+      }
+        ];
+  }
 
-      Just return me a json in the form of {"reply" : "insert your actual reply here in ${req.body.language} "}
+  else
 
-      Please only send the json and nothing else.Do not add anything in the reply value which gives me an error while doing a JSON.parse(). Keep the structure in such a way that on doing a JSON.parse() I can directly get the JSON.
-      Output in JSON format only. Do not use markdown.
+  {
+     parts = [
+      {
+        text: `You are an online teacher about the subject ${req.body.title}. The name of the chapter in that subject is ${req.body.chapterName}.You are teaching some one on one on text.
+  
+        The description of the chapter is ${req.body.description}
+              
+        Now act like ${req.body.character} and reply to the latest message in ${req.body.language} for teaching this chapter. Use phrases or dialouges that ${req.body.character} uses in their lingo without fail. Mimic their style and chat to give a feel that ${req.body.character} itself is texting. Use their references of things that ${req.body.character} is known for to explain ${req.body.chapterName} of ${req.body.title}.
+        
+        Now reply to this latest message of the user : ${req.body.newMessage}
 
-      `
-      
-    }
-      ];
+        Previous Message chain for context : ${req.body.messageChain}
+  
+        Just return me a json in the form of {"reply" : "insert your actual reply here in ${req.body.language} "}
+  
+        Please only send the json and nothing else.Do not add anything in the reply value which gives me an error while doing a JSON.parse(). Keep the structure in such a way that on doing a JSON.parse() I can directly get the JSON.
+        Output in JSON format only. 
+        
+        Do not use markdown.Do not use " symbol in the reply, if you have to use " use ' instead.You can use emojis.
+        Do not add line breaks manually.The formatting should be such that the whole reply is one long string.
+        `
+        
+      }
+        ];
+  }
+ 
+
+
 
       console.log(parts)
 
@@ -235,7 +274,7 @@ router.post('/chat',async (req,res)=>{
     safetySettings,
   });
 
-  console.log(result)
+  console.log("result",result)
 
 try{
 
@@ -248,9 +287,18 @@ try{
   const content = candidate.content?.parts[0].text;
   // Remove leading and trailing code block markers
   const cleanContent = content.replace(/^```json\n/, '').replace(/\n`$/, '').replace('```', '').replace("\\", "");;
-  console.log(cleanContent)
-  let objects = extract(cleanContent);
-  res.status(200).json(objects)
+  console.log("CC",cleanContent)
+  try{
+    console.log("trying to send a response")
+    let objects = await extract(cleanContent);
+    console.log("got hold of a json")
+    console.log(objects)
+    res.status(200).json(objects)
+  }catch(error)
+  {
+    console.log(error)
+  }
+
 
 }catch(error)
 {

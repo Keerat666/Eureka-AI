@@ -1,15 +1,15 @@
 import axios from "axios"; // Assuming axios is installed
 
-const baseUrl = "http://localhost:8009";
+const baseUrl = "https://voxmachina.onrender.com";
 
 
-  const chatAPI = async (title,chapterName,description,character,language,newMessage) => {
+  const chatAPI = async (title,chapterName,description,character,language,newMessage,type,messageChain) => {
 
     try {
-      const data = JSON.stringify({ title,chapterName,description,character,language,newMessage }); // Stringify the object
+      const data = JSON.stringify({ title,chapterName,description,character,language,newMessage,type,messageChain }); // Stringify the object
       const config = {
         method: "post",
-        url: `${baseUrl}/controller/chat`,
+        url: `${baseUrl}/controller/init-chat`,
         headers: {
           "Content-Type": "application/json",
         },
