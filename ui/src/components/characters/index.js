@@ -73,6 +73,7 @@ const CharacterList = ({ }) => {
   const initiate =()=>{
 
     const character = characters.find(item => item.id === selectedCharacter)
+    console.log(character)
     const chosenChapterTitle = chapters[index].title
 
     alert(character.name + " will teach the chapter "+chosenChapterTitle)
