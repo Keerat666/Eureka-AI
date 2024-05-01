@@ -69,7 +69,9 @@ const CharacterList = ({ }) => {
     const fetchCharacters = async () => {
       setIsLoading(true); // Set loading to true before fetching data
       const response = await getCharacters(); // Replace with your API call
-      setCharacters(response.results || []); // Assuming data is in response.data
+      const sorted = response.results.sort((a, b) => a.name.localeCompare(b.name));
+
+      setCharacters(sorted || []); // Assuming data is in response.data
       setIsLoading(false); // Set loading to false after data is fetched
     };
 

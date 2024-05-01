@@ -51,7 +51,7 @@ function HeaderPanel() {
               textDecoration: 'none',
             }}
           >
-            Crash Course
+            Eureka AI
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -106,7 +106,7 @@ function HeaderPanel() {
               textDecoration: 'none',
             }}
           >
-            Crash Course
+            Eureka AI
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
