@@ -13,7 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import './index.css'
-const pages = ['Home', 'About'];
+const pages = [];
 
 function HeaderPanel() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -22,9 +22,7 @@ function HeaderPanel() {
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
+
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
@@ -53,7 +51,7 @@ function HeaderPanel() {
               textDecoration: 'none',
             }}
           >
-            Vox Machina
+            Crash Course
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>

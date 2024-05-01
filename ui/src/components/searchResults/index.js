@@ -11,8 +11,8 @@ const SearchResults = ({ searchResults, cardListener }) => {
   return (
 <>
 
-<Typography variant="h5" component="div" sx={{marginTop : 4}}>
-          Search Results
+<Typography variant="h5" component="div" sx={{margin : 10}} style={{textAlign : "center"}}>
+          Search Results - {searchResults.length} {searchResults.length === 1 ? "match" : "matches"} found
         </Typography>
         <List dense={false}>
           {searchResults.map((item,index) => (

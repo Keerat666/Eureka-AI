@@ -14,6 +14,17 @@ const Chapters = () => {
   const description = location.state?.description;
   const navigate = useNavigate();
 
+  const chapterGenerationMessages = [
+    `Preparing chapters for ${topic}.`,
+    `Building your personalized learning path for ${topic}.`,
+    `Crafting the perfect chapters just for you.`,
+    `Compiling chapters relevant to ${topic}.`,
+    `Initializing chapter generation for ${topic} using Gemini.`,
+  ];
+
+  const [placeholder, setPlaceholder] = useState(chapterGenerationMessages[0]);
+
+
   useEffect(() => {
     const fetchChapters = async () => {
       setIsLoading(true);
@@ -22,6 +33,16 @@ const Chapters = () => {
       setChapters(res.results); // Assuming chapters are returned in "results"
       setIsLoading(false);
     };
+
+    const generateRandomMessage = () => {
+      const randomIndex = Math.floor(Math.random() * chapterGenerationMessages.length);
+      return chapterGenerationMessages[randomIndex];
+    };
+    
+
+    const timeoutId = setInterval(() => {
+      setPlaceholder(generateRandomMessage());
+    }, 3000); // Update message every second
 
     if (topic) {
       fetchChapters();
@@ -43,7 +64,7 @@ const Chapters = () => {
       {isLoading && (
         <> {/* Wrap loader and text in a fragment */}
           <CircularProgress size={40} />
-          <p>Generating chapters for {topic} ...</p>
+          <p>{placeholder}</p>
         </>
       )} {/* Show loader and text while fetching chapters */}
       {chapters.length > 0 && (
@@ -79,6 +100,6 @@ const Chapters = () => {
       {!isLoading && chapters.length === 0 && <Typography>No chapters found for this topic.</Typography>}
     </div>
   );
-};
+}
 
 export default Chapters;
