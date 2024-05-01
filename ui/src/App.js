@@ -10,7 +10,7 @@ import ChatComponent from "./pages/chat";
 function App() {
   return (
     <Router>
-      <div>
+      <div style={{height : "95vh"}}>
         <Header></Header>
         <Routes>
           <Route path="/" element={<Home />} /> {/* Home route at root path */}
@@ -21,6 +21,7 @@ function App() {
           {/* Chapters route with dynamic parameter */}
         </Routes>
       </div>
+      <p style={{textAlign : "center"}}>Made with ❤️ by <a href="https://github.com/Keerat666" target="_blank">Keerat</a> </p>
     </Router>
   );
 }

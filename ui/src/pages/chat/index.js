@@ -41,38 +41,68 @@ const useStyles = makeStyles({
   }
 });
 
-const ChatBox = ({ messages, typing , characterName, topic }) => {
+const ChatBox = ({ messages, typing, characterName, topic }) => {
   return (
     <div className="chat-history">
+      <Typography variant="h4">
+        Chat with {characterName} about {topic}
+      </Typography>
 
-<Typography variant="h4">
-Chat with {characterName} about {topic}
-  </Typography>
-      
-  <div className="chat-container">
-      {messages.map((message) => (
-       <Grid container key={message.id} spacing={2} style={{ marginTop: 10 }}>
-       <Grid item xs={1}>
-         <Avatar alt={message.sender} src={message.image} style={{ width: 60, height: 60 }} />
-       </Grid>
-       <Grid item xs={11} style={{ padding: 5 }}>
-         <div style={{ display: 'flex', alignItems: 'center' }}>
-           <Typography variant="body2" style={{ fontSize: 18 }}>
-             {message.text}
-           </Typography>
-         </div>
-       </Grid>
-     </Grid>
-      ))}
-    </div>
-       {typing === true ? <Typography variant="body1" style={{textAlign : "center", marginTop : 5}}>{characterName} is typing ... </Typography> : <></>}
+      <div className="chat-container">
+        {messages.map((message) => (
+          <Grid container key={message.id} spacing={2} style={{ marginTop: 10 }}>
+            <Grid item xs={12} sm={3} md={2}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar
+                  alt={message.sender}
+                  src={message.image}
+                  style={{ width: 40, height: 40, marginRight: 10 }}
+                />
+                <Typography variant="body2" style={{ fontSize: 16 }}>
+                  {message.sender}
+                </Typography>
+              </div>
+            </Grid>
+            <Grid item xs={12} sm={9} md={10}>
+              <Typography variant="body2" style={{ fontSize: 18 }}>
+                {message.text}
+              </Typography>
+            </Grid>
+          </Grid>
+        ))}
+      </div>
+
+      {typing === true ? (
+        <Typography variant="body1" style={{ textAlign: 'initial', marginTop: 5 }}>
+          {characterName} is typing...
+        </Typography>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
 
 
+
+
 const ChapterList = ({ chapters, onChapterTrigger, index }) => {
     const classes = useStyles();
+
+    const [width, setWidth] = useState(window.innerWidth);
+
+function handleWindowSizeChange() {
+  setWidth(window.innerWidth);
+}
+useEffect(() => {
+  window.addEventListener('resize', handleWindowSizeChange);
+  return () => {
+      window.removeEventListener('resize', handleWindowSizeChange);
+  }
+}, []);
+
+const isMobile = width <= 768;
+
     return (
       <List className={classes.chapterList}>
         {chapters.map((chapter, i) => (
@@ -82,7 +112,9 @@ const ChapterList = ({ chapters, onChapterTrigger, index }) => {
             onClick={() => onChapterTrigger(i)}
             style={{ backgroundColor: index === i ? '#6374F1' : '' }}
           >
-            <ListItemText primary={chapter.title} />
+
+
+            <ListItemText primary={!isMobile ? chapter.title : "Module "+(i+1)} />
           </ListItem>
         ))}
       </List>
@@ -107,6 +139,20 @@ const ChatComponent = () => {
 
   const [disableNewMessage, setDisableNewMessage] = useState(true);
   const navigate = useNavigate();
+
+  const [width, setWidth] = useState(window.innerWidth);
+
+  function handleWindowSizeChange() {
+    setWidth(window.innerWidth);
+  }
+  useEffect(() => {
+    window.addEventListener('resize', handleWindowSizeChange);
+    return () => {
+        window.removeEventListener('resize', handleWindowSizeChange);
+    }
+  }, []);
+  
+  const isMobile = width <= 768;
 
   
   const handleChapterTrigger = (chapterId) => {
@@ -175,7 +221,7 @@ const ChatComponent = () => {
       id: Date.now(), // Example: Generate unique ID for each message
       sender: 'System',
       text: `Switching to ${chapters[id].title} `,
-      image : "https://cdn-icons-png.flaticon.com/512/5087/5087579.png"
+      image : "https://www.shutterstock.com/image-vector/blank-avatar-photo-place-holder-600nw-1095249842.jpg"
     };
 
     setMessages(messages.concat(message))  
@@ -188,7 +234,7 @@ const ChatComponent = () => {
       id: Date.now(), // Example: Generate unique ID for each message
       sender: 'You',
       text: newMessage,
-      image : "https://cdn-icons-png.flaticon.com/512/5087/5087579.png"
+      image : "https://www.shutterstock.com/image-vector/blank-avatar-photo-place-holder-600nw-1095249842.jpg"
     };
 
     //setMessages([...messages, message]);  
@@ -202,6 +248,7 @@ const ChatComponent = () => {
   }
 
   const handleExport =()=>{
+    alert("This feature will be available soon.")
   }
 
   const handleClear =()=>{
@@ -225,47 +272,56 @@ const ChatComponent = () => {
     return response;
   }
 
-  return (
-    <div className={classes.container}>
-      <ChapterList chapters={chapters} onChapterTrigger={handleChapterTrigger} index={index} />
-      <Divider orientation="vertical" />
-      <div className={classes.chatBox} >
-        <ChatBox messages={messages} typing={disableNewMessage} characterName={character.name} topic={topic} />
-        <TextField
-          className={classes.messageInput}
-          label="Type your message..."
-          multiline
-          fullWidth
-          value={newMessage}
-          onChange={(event) => setNewMessage(event.target.value)}
-          onKeyPress={(event) => { if (event.key === 'Enter') handleSendMessage(); }}
-          disabled={disableNewMessage}
-          style={{marginTop : 5}}
-        />
+return (
+  <div className={classes.container}>
+    <ChapterList chapters={chapters} onChapterTrigger={handleChapterTrigger} index={index} />
+    <Divider orientation="vertical" />
+    <div className={classes.chatBox}>
+      <ChatBox messages={messages} typing={disableNewMessage} characterName={character.name} topic={topic} />
+      <TextField
+        className={classes.messageInput}
+        label="Type your message..."
+        multiline
+        fullWidth
+        value={newMessage}
+        onChange={(event) => setNewMessage(event.target.value)}
+        onKeyPress={(event) => { if (event.key === 'Enter') handleSendMessage(); }}
+        disabled={disableNewMessage}
+        style={{ marginTop: 5 }}
+      />
+      <Button disabled={disableNewMessage} variant="contained" color="primary" onClick={handleSendMessage} style={{ backgroundColor: '#4350af', color: 'white' }}>
+        Send
+      </Button>
 
-
-        <Button disabled={disableNewMessage} variant="contained" color="primary" onClick={handleSendMessage} style={{backgroundColor: '#4350af', color: 'white'}} >
-          Send
-        </Button>
-
+      {isMobile ? ( // Render buttons in a stack on mobile
+        <>
+          <Button variant="contained" disabled={disableNewMessage} onClick={handleClear} style={{ marginTop: 20 }}>
+            Clear Chat
+          </Button>
+          <Button variant="contained" disabled={disableNewMessage} onClick={handleExport} style={{ backgroundColor: '#5bc0be', color: 'white', marginTop: 20 }}>
+            Export Chat
+          </Button>
+          <Button variant="contained" color="secondary" onClick={handleFinish} style={{ marginTop: 20 }}>
+            Finish
+          </Button>
+        </>
+      ) : ( // Render buttons in a grid on desktop
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
-  <Button variant="contained" disabled={disableNewMessage} onClick={handleClear} style={{ marginTop: 20 , marginBottom : 20 , marginRight : 20 }}>
-    Clear Chat
-  </Button>
-  <Button variant="contained" disabled={disableNewMessage} onClick={handleExport} style={{ backgroundColor: '#5bc0be', color: 'white', margin: 20 }}>
-    Export Chat
-  </Button>
-  <Button variant="contained" color="secondary" onClick={handleFinish} style={{ margin: 20 }}>
-    Finish
-  </Button>
-
+          <Button variant="contained" disabled={disableNewMessage} onClick={handleClear} style={{ marginTop: 20, marginBottom: 20, marginRight: 20 }}>
+            Clear Chat
+          </Button>
+          <Button variant="contained" disabled={disableNewMessage} onClick={handleExport} style={{ backgroundColor: '#5bc0be', color: 'white', margin: 20 }}>
+            Export Chat
+          </Button>
+          <Button variant="contained" color="secondary" onClick={handleFinish} style={{ margin: 20 }}>
+            Finish
+          </Button>
         </div>
- 
-
-
-      </div>
+      )}
     </div>
-  );
+  </div>
+);
+
 };
 
 export default ChatComponent;

@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import { Grid } from '@material-ui/core'; // Import Grid component
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import CircularProgress from '@material-ui/core/CircularProgress'; // Import CircularProgress
 
 const useStyles = makeStyles({
   container: {
@@ -44,11 +45,18 @@ const useStyles = makeStyles({
   radioSelected: {
     color: 'green', // Example: Change color to green when selected
   },
+  loaderContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%', // Ensure loader covers the entire container
+  },
 });
 
 const CharacterList = ({ }) => {
   const classes = useStyles();
   const [characters, setCharacters] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Add state for loading indicator
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const location = useLocation();
   const chapters = location.state?.chapters; // Access data using optional chaining
@@ -59,8 +67,10 @@ const CharacterList = ({ }) => {
 
   useEffect(() => {
     const fetchCharacters = async () => {
+      setIsLoading(true); // Set loading to true before fetching data
       const response = await getCharacters(); // Replace with your API call
       setCharacters(response.results || []); // Assuming data is in response.data
+      setIsLoading(false); // Set loading to false after data is fetched
     };
 
     fetchCharacters();
@@ -70,25 +80,28 @@ const CharacterList = ({ }) => {
     setSelectedCharacter(parseInt(event.target.value)); // Convert value to integer
   };
 
-  const initiate =()=>{
-
-    const character = characters.find(item => item.id === selectedCharacter)
-    console.log(character)
-    const chosenChapterTitle = chapters[index].title
-
-    alert(character.name + " will teach the chapter "+chosenChapterTitle)
-    navigate(`/learn`, { state: { chapters: chapters , index: index , character : character, topic : topic} }); 
-
-  }
+  const initiate = () => {
+    const character = characters.find(item => item.id === selectedCharacter);
+    console.log(character);
+    const chosenChapterTitle = chapters[index].title;
+    navigate('/learn', {
+      state: { chapters, index, character, topic },
+    });
+  };
 
   return (
     <div className={classes.container}>
       <Typography variant="h5" component="div" style={{ textAlign: 'center' }}>
-        Choose Your Teacher
+        Choose your AI tutor
       </Typography>
-      <Grid container spacing={2}>
-        {characters.map((character) => (
-          <Grid item xs={12} key={character.id}>
+      {isLoading ? (
+        <div className={classes.loaderContainer}>
+          <CircularProgress /> {/* Display loader while data is being fetched */}
+        </div>
+      ) : (
+        <Grid container spacing={2}>
+          {characters.map((character) => (
+            <Grid item xs={12} key={character.id}>
             <div className={classes.teacherCard}>
               <Avatar
                 alt={character.name}
@@ -108,11 +121,13 @@ const CharacterList = ({ }) => {
           </Grid>
         ))}
       </Grid>
-      <Button variant="contained" color="primary" disabled={!selectedCharacter} className={classes.proceedButton} onClick={() => initiate()}>
+    
+  )}
+        <Button variant="contained" color="primary" disabled={!selectedCharacter} className={classes.proceedButton} onClick={() => initiate()}>
         Proceed
       </Button>
-    </div>
-  );
-};
+  </div>
+)};
+
 
 export default CharacterList;

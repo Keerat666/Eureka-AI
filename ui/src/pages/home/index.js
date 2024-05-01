@@ -8,6 +8,7 @@ import CircularProgress from '@material-ui/core/CircularProgress'; // Import for
 import { useNavigate } from 'react-router-dom';
 import Speak from '../../components/speak';
 import Listen from '../../components/listen';
+import { Box, Container, List, ListItem, ListItemText } from '@material-ui/core';
 
 const useStyles = makeStyles({
   container: {
@@ -15,27 +16,42 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100vh', // Ensures footer stays at bottom (optional)
+    padding : "10px",
+    marginTop : "10px"
   },
   heading: {
     marginBottom: 20,
     fontSize: '2.1rem', // Default font size
-  },
-  '@media (max-width: 600px)': { // Target screens less than 600px wide
-    heading: {
-      marginBottom: 20,
-      fontSize: '1.8rem', // Smaller font size for mobile
-    },
   },
   searchButton: {
     marginTop: 25, // Add some margin for spacing
   },
   trySearchingText: { // Class for styling "Try searching..."
     marginTop: 20, // Add some margin for spacing
-    textAlign: 'center', // Center align the text
+    textAlign: 'initial', // Center align the text
+    marginBottom : 10
   },
   loader: {
     marginTop: 25, // Center the loader
+  },
+  root: {
+    margin: 2, // Use Material-UI spacing for margin
+  },
+  content: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  list: {
+    padding: 0,
+    margin: 0,
+    listStyle: 'none', // Remove default list style
+    marginBottom: 2, // Add spacing after list
+  },
+  listItem: {
+    marginBottom: 2, // Add spacing between list items
+  },
+  listItemText: {
+    fontSize: 8, // Set font size for list item text
   },
 });
 
@@ -58,21 +74,37 @@ const Home = () => {
   };
 
   return (
+
+    <div>
+      <div style={{margin : 10}}>
+  <div class="content">
+  <Container maxWidth="md" className={classes.root}>
+      <Typography variant="h6">
+        A Personalized Learning Journey
+      </Typography>
+      <Box className={classes.content}>
+        <Typography variant="body1">
+          Dive into a world of knowledge tailored just for you! This innovative application unlocks a personalized learning experience, guiding you on your path to mastery.
+        </Typography>
+        <Typography variant="body1">Ready to embark on your personalized learning adventure? Try searching for any topic!</Typography>
+      </Box>
+    </Container>
+  </div>
+
+      </div>
     <div className={classes.container}> {/* Apply container styles */}
       <SearchBar onSearch={handleSearch} className={classes.searchBar} wrap="break-word" />
-
-      <Typography variant="body2" className={classes.trySearchingText}> {/* Use body1 for body text */}
-        Search for anything, like <strong>Recursion, Water Color Painting, Cricket...</strong>
-      </Typography>
-
-      {isLoading && (
-        <CircularProgress size={40} className={classes.loader} /> // Show loader when isLoading is true
-      )}
+</div>
+{isLoading && (
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+    <CircularProgress size={40} className={classes.loader} />
+  </div>
+)}
 
       {searchResults.length > 0 && (
         <SearchResults searchResults={searchResults} cardListener={cardListener}></SearchResults>
       )}
-    </div>
+</div>
   );
 };
 

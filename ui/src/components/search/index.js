@@ -24,8 +24,6 @@ const SearchBar = ({ onSearch }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleChange = (event) => {
-
-    console.log(event.target.value)
     setSearchTerm(event.target.value);
   };
 
@@ -38,7 +36,7 @@ const SearchBar = ({ onSearch }) => {
       <TextField
         id="outlined-search"
         type="search"
-        placeholder='Enter any topic'
+        placeholder='Search for anything...'
         variant="outlined"
         value={searchTerm}
         onChange={handleChange}
